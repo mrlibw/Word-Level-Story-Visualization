@@ -1,90 +1,86 @@
-# Lightweight Generative Adversarial Networks for Text-Guided Image Manipulation
-Pytorch implementation for Lightweight Generative Adversarial Networks for Text-Guided Image Manipulation. The goal is to introduce a lightweight generative adversarial network for efficient image manipulation using natural language descriptions.
+# Word-Level Fine-Grained Story Visualization
+Pytorch implementation for Word-Level Fine-Grained Story Visualization. The goal is to generate a sequence of images to narrate each sentence in a multi-sentence story with a global consistency across dynamic scenes and characters.
 
 ### Overview
-<img src="archi.jpg" width="940px" height="230px"/>
+<img src="archi.jpg" width="940px" height="140px"/>
 
-**[Lightweight Generative Adversarial Networks for Text-Guided Image Manipulation](https://proceedings.neurips.cc/paper/2020/file/fae0b27c451c728867a567e8c1bb4e53-Paper.pdf).**  
-[Bowen Li](https://mrlibw.github.io/), [Xiaojuan Qi](https://xjqi.github.io/), [Philip H. S. Torr](http://www.robots.ox.ac.uk/~phst/), [Thomas Lukasiewicz](http://www.cs.ox.ac.uk/people/thomas.lukasiewicz/).<br> University of Oxford, University of Hong Kong <br> NeurIPS 2020 <br>
+**[Word-Level Fine-Grained Story Visualization](https://arxiv.org/pdf/2208.02341.pdf).**  
+[Bowen Li](https://mrlibw.github.io/), [Thomas Lukasiewicz](http://www.cs.ox.ac.uk/people/thomas.lukasiewicz/).<br> University of Oxford, TU Wien <br> ECCV 2022 <br>
 
 ### Data
 
-1. Download the preprocessed metadata for [bird](https://drive.google.com/file/d/1D87x3JAt0w9ymlKElh7ArpAviKUqkNbN/view?usp=sharing) and [coco](https://drive.google.com/file/d/1hNEsFDj7S0aG1tXFvJy1DXtQWSl2Z9gZ/view?usp=sharing), and save both into `data/`
-2. Download [bird](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) dataset and extract the images to `data/birds/`
-3. Download [coco](http://cocodataset.org/#download) dataset and extract the images to `data/coco/`
+1. Download [Pororo](https://drive.google.com/file/d/12qJb-faG196LiYovnhTUoaQK1suNAPFK/view?usp=share_link) dataset and extract the folder to `data/pororo`.
+2. Download [Abstract Scenes](https://drive.google.com/file/d/1E0eOx3_pRFZvaKV9uWAA6o0opZxZ4Q1p/view?usp=share_link) dataset and extract the folder to `data/abstract`.
 
 ### Training
 All code was developed and tested on CentOS 7 with Python 3.7 (Anaconda) and PyTorch 1.1.
 
-#### [DAMSM](https://github.com/taoxugit/AttnGAN) model includes a text encoder and an image encoder
-- Pre-train DAMSM model for bird dataset:
-```
-python pretrain_DAMSM.py --cfg cfg/DAMSM/bird.yml --gpu 0
-```
-- Pre-train DAMSM model for coco dataset: 
-```
-python pretrain_DAMSM.py --cfg cfg/DAMSM/coco.yml --gpu 1
-```
+#### Text Encoder Pretraining
+
+- Please refer [ControlGAN](https://github.com/mrlibw/ControlGAN) for more details about pretraining the text encoder. The text encoder pretraining is based on [DAMSM](https://github.com/taoxugit/AttnGAN), which maximizes the cosine similarity between text and image pairs provided by the corresponding dataset.
+
 #### Our Model
-- Train the model for bird dataset:
+- Train the model for Pororo dataset:
 ```
-python main.py --cfg cfg/train_bird.yml --gpu 2
+python main_pororo.py --cfg cfg/pororo.yml
 ```
-- Train the model for coco dataset: 
+- Train the model for Abstract dataset: 
 ```
-python main.py --cfg cfg/train_coco.yml --gpu 3
+python main_abstract.py --cfg cfg/abstract.yml
 ```
 
-`*.yml` files include configuration for training and testing. To reduce the number of parameters used in the model, please edit DF_DIM and/or GF_DIM values in the corresponding `*.yml` files.
+`*.yml` files include configuration for training and testing. If you store the datasets in somewhere else, please modify `DATA_DIR` to point to the location.
 
-#### Pretrained DAMSM Model
-- [DAMSM for bird](https://drive.google.com/file/d/1n-qKR7K4V-4oVC1GaGeIHLTQfIzPsTsE/view?usp=sharing). Download and save it to `DAMSMencoders/`
-- [DAMSM for coco](https://drive.google.com/file/d/1GnXhzMKtFM-RK_ATsfU1tomta1Ko72vr/view?usp=sharing). Download and save it to `DAMSMencoders/`
-#### Pretrained Lightweight Model 
-- [Bird](https://drive.google.com/file/d/1ojDzj4zak0-L9tG48hSfN9FxibwjsS6V/view?usp=sharing). Download and save it to `models/`
+`Note that` we evaluate our approach at the resolution 64 × 64 on Pororo and 256×256 on Abstract Scenes, as Abstract Scenes provides larger-scale ground-truth images. To work on images at the resolution 256 × 256, we repeat the same upsampling blocks in the generator and downsampling blocks in the discriminator.
 
-- [COCO](https://drive.google.com/file/d/1fhGtqEF2FRZNq8-wNrDUgD6paMGEC-SW/view?usp=sharing). Download and save it to `models/`
+#### Pretrained Text Encoder
+- [Text Encoder for Pororo](https://drive.google.com/file/d/1FG8iB65hdNHUsz0v-XloYzd6AAE8mZSv/view?usp=share_link). Download and save it to `textEncoder/`.
+- [Text Encoder for Abstract Scenes](https://drive.google.com/file/d/1eiAQ_44lh-zZ3LKP9P4TW9-slmJPiWdh/view?usp=share_link). Download and save it to `textEncoder/`.
 
-### Testing
-- Test our model on bird dataset:
-```
-python main.py --cfg cfg/eval_bird.yml --gpu 4
-```
-- Test our model on coco dataset: 
-```
-python main.py --cfg cfg/eval_coco.yml --gpu 5
-```
+#### Pretrained Our Model 
+- [Pororo](https://drive.google.com/file/d/1TDSytZIjjSHfnCuAYc_NP0ZgKtkpai5p/view?usp=share_link). Download and save it to `models/`.
+
+- [Abstract](https://drive.google.com/file/d/1Dc71lOm10Ovw9WekNJT4XWD2L-T7nQYk/view?usp=share_link). Download and save it to `models/`.
+
 ### Evaluation
+- Run the following commands to evaluate our approach on the `Pororo` and `Abstract Scenes` test dataset, including image generation of all stories in the test dataset, and calculation of both FID and FSD scores:
+```
+python main_pororo.py --cfg ./cfg/pororo.yml --eval_fid True
+```
+```
+python main_abstract.py --cfg ./cfg/abstract.yml --eval_fid True
+```
 
-- To generate images for all captions in the testing dataset, change B_VALIDATION to `True` in the `eval_*.yml`. 
+FID and FSD results will be saved in a `.csv` file.
+
 - [Fréchet Inception Distance](https://github.com/mseitzer/pytorch-fid).
 
+- [Fréchet Story Distance](https://github.com/basiclab/CPCStoryVisualization-Pytorch).
+
 ### Code Structure
-- code/main.py: the entry point for training and testing.
-- code/trainer.py: creates the networks, harnesses and reports the progress of training.
-- code/model.py: defines the architecture.
-- code/attention.py: defines the spatial and channel-wise attentions.
-- code/VGGFeatureLoss.py: defines the architecture of the VGG-16.
-- code/datasets.py: defines the class for loading images and captions.
-- code/pretrain_DAMSM.py: trains the text and image encoders, harnesses and reports the progress of training. 
-- code/miscc/losses.py: defines and computes the losses.
-- code/miscc/config.py: creates the option list.
-- code/miscc/utils.py: additional functions.
+- cfg/: contains `*.yml` files.
+- datasets/: dataloader.
+- main_pororo.py: the entry point for training and testing on Pororo.
+- main_abstract.py: the entry point for training and testing on Abstract Scenes.
+- trainer.py: creates the networks, harnesses and reports the progress of training.
+- model.py: defines the architecture.
+- inference.py: functions for evaluation.
+- miscc/utils.py: loss functions and addtional help functions.
+- miscc/config.py: creates the option list.
 
 ### Citation
 
 If you find this useful for your research, please use the following.
 
 ```
-@article{li2020lightweight,
-  title={Lightweight Generative Adversarial Networks for Text-Guided Image Manipulation},
-  author={Li, Bowen and Qi, Xiaojuan and Torr, Philip and Lukasiewicz, Thomas},
-  journal={Advances in Neural Information Processing Systems},
-  volume={33},
-  year={2020}
+@article{li2022word,
+  title={Word-Level Fine-Grained Story Visualization},
+  author={Li, Bowen and Lukasiewicz, Thomas},
+  journal={arXiv preprint arXiv:2208.02341},
+  year={2022}
 }
 ```
 
 ### Acknowledgements
-This code borrows heavily from [ManiGAN](https://github.com/mrlibw/ManiGAN) and [ControlGAN](https://github.com/mrlibw/ControlGAN) repositories. Many thanks.
+This code borrows from [StoryGAN](https://github.com/yitong91/StoryGAN) and [ControlGAN](https://github.com/mrlibw/ControlGAN) repositories. Many thanks.
 
